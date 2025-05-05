@@ -1,0 +1,28 @@
+body.bg-gradient-custom {
+  height: 100vh;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
+}
+
+.card {
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  background-color: #ffffff;
+}
+
+.btn-success {
+  font-weight: 600;
+}
+
+.form-label {
+  font-weight: 500;
+}
+
+a {
+  color: #5c80bc;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}

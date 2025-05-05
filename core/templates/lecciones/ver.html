@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <h2>{{ leccion.titulo }}</h2>
+<p>{{ leccion.descripcion }}</p>
+<iframe width="560" height="315" src="{{ leccion.video_url }}" frameborder="0" allowfullscreen></iframe>
+
+</body>
+</html>

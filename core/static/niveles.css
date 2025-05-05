@@ -1,0 +1,21 @@
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(to right, #e6ecf3, #f8fbff);
+  min-height: 100vh;
+}
+.nivel-btn {
+  border-radius: 12px;
+  padding: 10px 20px;
+  font-weight: 600;
+  margin: 0 10px;
+}
+.leccion-card {
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  background: #fff;
+  padding: 20px;
+}
+.leccion-card .btn {
+  border-radius: 8px;
+  font-weight: 600;
+}

@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title %}Selecciona Nivel{% endblock %}
+
+{% block content %}
+  <h2 class="text-center mb-4 fw-bold">Hola {{ request.session.usuario_nombre }}, ¿qué nivel deseas aprender hoy?</h2>
+
+  <div class="text-center mb-5">
+    <a href="{% url 'lecciones_por_nivel' 'B' %}" class="btn btn-outline-primary nivel-btn">Básico</a>
+    <a href="{% url 'lecciones_por_nivel' 'I' %}" class="btn btn-outline-success nivel-btn">Intermedio</a>
+    <a href="{% url 'lecciones_por_nivel' 'A' %}" class="btn btn-outline-danger nivel-btn">Avanzado</a>
+  </div>
+{% endblock %}
