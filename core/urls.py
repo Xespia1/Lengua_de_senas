@@ -9,4 +9,5 @@ urlpatterns = [
     path('lecciones/', views.seleccionar_nivel, name='lecciones'),
     path('lecciones/<str:nivel>/', views.lecciones_por_nivel, name='lecciones_por_nivel'),
     path('leccion/<int:pk>/', views.ver_leccion, name='ver_leccion'),
+    path('quiz/<int:leccion_id>/', views.quiz_view, name='quiz'),
 ]

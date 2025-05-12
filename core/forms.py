@@ -1,5 +1,6 @@
 from django import forms
 from .models import Usuario
+from .models import Pregunta, Respuesta
 
 class RegistroForm(forms.ModelForm):
     contraseña = forms.CharField(widget=forms.PasswordInput)
@@ -18,3 +19,14 @@ class RegistroForm(forms.ModelForm):
 class LoginForm(forms.Form):
     correo = forms.EmailField()
     contraseña = forms.CharField(widget=forms.PasswordInput)
+    
+class QuizForm(forms.Form):
+    def __init__(self, preguntas, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for pregunta in preguntas:
+            opciones = [(r.id, r.texto) for r in pregunta.respuestas.all()]
+            self.fields[f"pregunta_{pregunta.id}"] = forms.ChoiceField(
+                label=pregunta.texto,
+                choices=opciones,
+                widget=forms.RadioSelect
+            )

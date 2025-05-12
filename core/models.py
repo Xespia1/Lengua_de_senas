@@ -31,4 +31,19 @@ class Leccion(models.Model):
 
     def __str__(self):
         return f"{self.get_nivel_display()} - {self.titulo}"
+    
+class Pregunta(models.Model):
+    leccion = models.ForeignKey(Leccion, on_delete=models.CASCADE, related_name='preguntas')
+    texto = models.TextField()
+
+    def __str__(self):
+        return f"{self.leccion.titulo}: {self.texto[:30]}..."
+
+class Respuesta(models.Model):
+    pregunta = models.ForeignKey(Pregunta, on_delete=models.CASCADE, related_name='respuestas')
+    texto = models.CharField(max_length=200)
+    es_correcta = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.texto} ({'Correcta' if self.es_correcta else 'Incorrecta'})"
 

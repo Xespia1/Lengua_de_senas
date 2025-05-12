@@ -9,7 +9,23 @@
 <body>
   <h2>{{ leccion.titulo }}</h2>
 <p>{{ leccion.descripcion }}</p>
-<iframe width="560" height="315" src="{{ leccion.video_url }}" frameborder="0" allowfullscreen></iframe>
+<div class="row mt-4">
+  {% for leccion in lecciones %}
+    <div class="col-md-4 mb-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">{{ leccion.titulo }}</h5>
+          <p class="card-text">{{ leccion.descripcion }}</p>
+          <a href="{% url 'ver_leccion' leccion.id %}" class="btn btn-primary">Ver Lección</a>
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <p class="text-muted">No hay lecciones disponibles en este nivel.</p>
+  {% endfor %}
+</div>
+
+
 
 </body>
 </html>
