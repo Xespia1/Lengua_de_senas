@@ -1,22 +1,23 @@
 {% extends 'base.html' %}
-{% block title %}Evaluación - {{ leccion.titulo }}{% endblock %}
+{% block title %}Quiz - {{ leccion.titulo }}{% endblock %}
 
 {% block content %}
-  <h2 class="fw-bold mb-4 text-center">Evaluación: {{ leccion.titulo }}</h2>
 
-  <form method="post">
+<div class="container mt-5">
+  <div class="card shadow">
+    <div class="card-body">
+      <form method="post">
     {% csrf_token %}
+    <h2 class="text-center mb-4">Quiz: {{ leccion.get_nivel_display }}, {{ leccion.titulo }}</h2>
     {% for field in form %}
-      <div class="mb-4">
-        <label class="form-label fw-semibold">{{ field.label }}</label>
-        <div class="ms-3">
-          {{ field }}
-        </div>
+      <div class="mb-3">
+        <label class="form-label"><b>Pregunta {{ forloop.counter }}: {{ field.label }}</b></label>
+        {{ field }}
       </div>
     {% endfor %}
-
-    <div class="d-grid">
-      <button type="submit" class="btn btn-success">Enviar respuestas</button>
+    <button type="submit" class="btn btn-primary w-100">Enviar respuestas</button>
+</form>
     </div>
-  </form>
+  </div>
+</div>
 {% endblock %}

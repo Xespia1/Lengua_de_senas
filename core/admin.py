@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Leccion, Video
+from .models import *
 
 # admin.site.register(Leccion)
 
@@ -12,3 +12,5 @@ class LeccionAdmin(admin.ModelAdmin):
     
 admin.site.register(Leccion, LeccionAdmin)
 admin.site.register(Video)
+admin.site.register(Pregunta)
+admin.site.register(Respuesta)

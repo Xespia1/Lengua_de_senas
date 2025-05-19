@@ -66,17 +66,24 @@ class Video(models.Model):
 
     
 class Pregunta(models.Model):
-    leccion = models.ForeignKey(Leccion, on_delete=models.CASCADE, related_name='preguntas')
-    texto = models.TextField()
+    leccion = models.ForeignKey('Leccion', related_name='preguntas', on_delete=models.CASCADE)
+    texto = models.CharField(max_length=255)
 
     def __str__(self):
-        return f"{self.leccion.titulo}: {self.texto[:30]}..."
+        return self.texto
 
 class Respuesta(models.Model):
-    pregunta = models.ForeignKey(Pregunta, on_delete=models.CASCADE, related_name='respuestas')
-    texto = models.CharField(max_length=200)
+    pregunta = models.ForeignKey(Pregunta, related_name='respuestas', on_delete=models.CASCADE)
+    texto = models.CharField(max_length=255)
     es_correcta = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.texto} ({'Correcta' if self.es_correcta else 'Incorrecta'})"
+        return self.texto
+
+class ResultadoQuiz(models.Model):
+    usuario = models.ForeignKey('Usuario', on_delete=models.CASCADE)
+    leccion = models.ForeignKey('Leccion', on_delete=models.CASCADE)
+    puntaje = models.IntegerField()
+    fecha = models.DateTimeField(auto_now_add=True)
+
 
