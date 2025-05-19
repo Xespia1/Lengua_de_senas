@@ -1,10 +1,37 @@
 {% extends 'base.html' %}
-{% load static %}
 
 {% block content %}
-<div class="container mt-4">
-  <h3 class="mb-4 fw-bold text-center">Lecciones disponibles (Nivel {{ nivel }})</h3>
 
+{% with lecciones.0.nivel as nivel_actual %}
+<a href="{% url 'lecciones' %}" style="
+    position: absolute;
+    top: 130px;
+    left: 350px;
+    background: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    z-index: 1000;
+">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none"
+        stroke="{% if nivel_actual == 'B' %}#0d6efd
+                {% elif nivel_actual == 'I' %}#198754
+                {% elif nivel_actual == 'A' %}#dc3545
+                {% else %}#6c757d{% endif %}"
+        stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 18l-6-6 6-6"/>
+    </svg>
+</a>
+{% endwith %}
+
+<div class="container mt-5">
+  <h2 class="text-center mb-4">Lecciones</h2>
   <div class="row">
     {% for leccion in lecciones %}
       <div class="col-md-4 mb-4">
@@ -12,12 +39,18 @@
           <div class="card-body">
             <h5 class="card-title">{{ leccion.titulo }}</h5>
             <p class="card-text">{{ leccion.descripcion }}</p>
-            <a href="{% url 'ver_leccion' leccion.pk %}" class="btn btn-primary">Ver Lección</a>
+            <p class="text-muted">Nivel: {{ leccion.get_nivel_display }}</p>
+            <a href="{% url 'ver_leccion' leccion.id %}"
+               class="btn {% if leccion.nivel == 'B' %}btn-primary
+                         {% elif leccion.nivel == 'I' %}btn-success
+                         {% elif leccion.nivel == 'A' %}btn-danger
+                         {% else %}btn-secondary{% endif %}">Ver lección
+            </a>
           </div>
         </div>
       </div>
     {% empty %}
-      <p class="text-center">No hay lecciones disponibles para este nivel.</p>
+      <p class="text-muted">No hay lecciones disponibles.</p>
     {% endfor %}
   </div>
 </div>

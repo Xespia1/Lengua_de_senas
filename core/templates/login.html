@@ -34,11 +34,11 @@
         {% csrf_token %}
         {{ form.non_field_errors }}
         <div class="mb-3">
-          <label for="id_correo" class="form-label">Correo electrónico</label>
+          <label for="id_correo" class="form-label" aria-placeholder="ejemplo@correo.com">Correo electrónico</label>
           {{ form.correo|add_class:"form-control" }}
         </div>
         <div class="mb-3">
-          <label for="id_contraseña" class="form-label">Contraseña</label>
+          <label for="id_contraseña" class="form-label" aria-placeholder="********" >Contraseña</label>
           {{ form.contraseña|add_class:"form-control" }}
         </div>
         <div class="d-grid mb-3">

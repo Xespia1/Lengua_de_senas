@@ -17,8 +17,15 @@ class RegistroForm(forms.ModelForm):
         return usuario
 
 class LoginForm(forms.Form):
-    correo = forms.EmailField()
-    contraseña = forms.CharField(widget=forms.PasswordInput)
+    correo = forms.EmailField(label="Correo electrónico",
+            widget=forms.EmailInput(attrs={
+                'placeholder': 'ejemplo@correo.com',
+                'class': 'form-control',
+            }))
+    contraseña = forms.CharField(widget=forms.PasswordInput(attrs={
+            'placeholder': '********',
+            'class': 'form-control',
+        }))
     
 class QuizForm(forms.Form):
     def __init__(self, preguntas, *args, **kwargs):

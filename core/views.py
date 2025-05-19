@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .forms import RegistroForm, LoginForm, QuizForm
 from .models import Leccion, Pregunta, Respuesta, Usuario
 from django.contrib import messages
-from django.contrib.auth import authenticate, logout, login
+from django.contrib.auth import authenticate, logout, login as auth_login
 
 def registro(request):
     if request.method == 'POST':
@@ -21,18 +21,17 @@ def login(request):
         if form.is_valid():
             correo = form.cleaned_data['correo']
             contraseña = form.cleaned_data['contraseña']
-            try:
-                usuario = Usuario.objects.get(correo=correo)
-                if usuario.contraseña == contraseña:
-                    request.session['usuario_id'] = usuario.id
-                    request.session['usuario_nombre'] = usuario.nombre
-                    return redirect('lecciones')
-                else:
-                    messages.error(request, 'Contraseña incorrecta.')
-            except Usuario.DoesNotExist:
-                messages.error(request, 'El correo no está registrado.')
+
+            usuario = authenticate(request, username=correo, password=contraseña)
+
+            if usuario is not None:
+                auth_login(request, usuario)
+                return redirect('lecciones')
+            else:
+                messages.error(request, 'Correo o contraseña incorrectos.')
     else:
         form = LoginForm()
+
     return render(request, 'login.html', {'form': form})
 
 def home(request):
@@ -55,9 +54,9 @@ def lecciones_por_nivel(request, nivel):
     })
 
 def ver_leccion(request, pk):
-    nivel = request.GET.get('nivel', 'B')  # B por defecto
-    lecciones = Leccion.objects.filter(nivel=nivel).order_by('orden')
-    return render(request, 'lecciones.html', {'lecciones': lecciones, 'nivel': nivel})
+    leccion = get_object_or_404(Leccion, pk=pk)
+    return render(request, 'lecciones/ver_leccion.html', {'leccion': leccion})
+
 
 def logout_view(request):
     request.session.flush()

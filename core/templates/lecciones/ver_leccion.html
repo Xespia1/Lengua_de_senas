@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}{{ leccion.titulo }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="card shadow">
+    <div class="card-body">
+      <h2 class="card-title text-center">{{ leccion.titulo }}</h2>
+      <p class="text-muted text-center">{{ leccion.get_nivel_display }} - Lección {{ leccion.orden }}</p>
+      
+
+      {% if leccion.videos.all %}
+      <div id="videoCarousel" class="carousel slide mb-4" data-bs-interval="false">
+        <div class="carousel-inner">
+          {% for video in leccion.videos.all %}
+          <div class="mb-4">
+            <h5 class="mb-2">{{ Video.titulo }}</h5>
+            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+            <div class="ratio ratio-16x9">
+            <iframe src="{{ video.embed_url }}" title="Video {{ forloop.counter }}" allowfullscreen></iframe>
+          </div>
+          </div>
+          </div>
+          
+          {% endfor %}
+        </div>
+
+        <!-- Boton Anterior -->
+        <button class="carousel-control-prev btn" type="button" data-bs-target="#videoCarousel" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" style="filter: invert(1);" aria-hidden="true"></span>
+        </button>
+
+        <!-- Boton Siguiente -->
+        <button class="carousel-control-next btn" type="button" data-bs-target="#videoCarousel" data-bs-slide="next">
+          <span class="carousel-control-next-icon" style="filter: invert(1);" aria-hidden="true"></span>
+        </button>
+      </div>
+      {% else %}
+        <p>No hay videos disponibles para esta lección.</p>
+      {% endif %}
+
+      <div class="d-flex justify-content-end">
+        <a href="{% url 'lecciones_por_nivel' leccion.nivel %}" class="btn btn-primary  
+            btn {% if leccion.nivel == 'B' %}btn-primary
+            {% elif leccion.nivel == 'I' %}btn-success
+            {% elif leccion.nivel == 'A' %}btn-danger
+            {% else %}btn-secondary{% endif %}"">Volver a {{ leccion.get_nivel_display }}</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
