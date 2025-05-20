@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% block title %}Progreso de Estudiantes{% endblock %}
+
+{% block content %}
+<style>
+  .progreso-card {
+    max-width: 750px;
+    margin: 40px auto 0 auto;
+    background: #fff;
+    border-radius: 24px;
+    box-shadow: 0 6px 32px rgba(0,0,0,0.10);
+    padding: 2.5rem 2rem;
+  }
+  .progreso-bar-bg {
+    background: #e2e5e8;
+    border-radius: 1.2rem;
+    overflow: hidden;
+    height: 28px;
+    margin-bottom: 1.7rem;
+  }
+  .progreso-bar-fill {
+    background: repeating-linear-gradient(135deg, #36ba7e 0 12px, #3b9162 12px 24px);
+    color: #fff;
+    text-align: center;
+    line-height: 28px;
+    font-weight: bold;
+    font-size: 18px;
+    height: 100%;
+    transition: width 0.7s;
+  }
+</style>
+
+<div class="progreso-card">
+  <h1 class="text-center mb-4" style="font-weight: 800;">Progreso de Estudiantes</h1>
+
+  <div class="mb-4">
+    <div><b>Progreso general del curso:</b></div>
+    <div class="progreso-bar-bg">
+      <div class="progreso-bar-fill" style="width: {{ porcentaje|default:'60' }}%;">
+        {{ porcentaje|default:"60" }}%
+      </div>
+    </div>
+  </div>
+
+  <div class="mb-3" style="font-size: 1.35rem; font-weight: 700;">Resultados de quizzes:</div>
+  <div style="overflow-x:auto;">
+    <table class="table align-middle">
+      <thead>
+        <tr>
+          <th>Estudiante</th>
+          <th>Apellido</th>
+          <th>Lección</th>
+          <th>Puntaje</th>
+          <th>Total</th>
+          <th>Fecha</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for resultado in resultados %}
+        <tr>
+          <td>{{ resultado.usuario }}</td>
+          <td>{{ resultado.usuario.apellido }}</td>
+          <td>{{ resultado.leccion.titulo }}</td>
+          <td>
+            <span class="badge bg-{% if resultado.puntaje == resultado.total %}success{% elif resultado.puntaje == 0 %}danger{% else %}warning text-dark{% endif %}">
+              {{ resultado.puntaje }}
+            </span>
+          </td>
+          <td>{{ resultado.total }}</td>
+          <td>{{ resultado.fecha|date:"d/m/Y H:i" }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="5" class="text-muted text-center">No hay resultados registrados.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

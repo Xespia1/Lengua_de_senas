@@ -41,12 +41,22 @@
     <div class="container">
       <a class="navbar-brand" href="{% url 'lecciones' %}">Aprende LSCH</a>
       <div class="ms-auto">
+        <!-- Ver Progreso Alumno-->
+        {% if request.user.is_authenticated and request.user.rol == 'estudiante' %}
+        <a href="{% url 'progreso_usuario' %}" class="btn btn-warning me-2">Ver mi progreso</a>
+        {% endif %}
+
+        <!-- Ver Progreso Docente-->
+        {% if request.user.is_authenticated and request.user.rol == 'docente' %}
+        <a href="{% url 'progreso_estudiantes' %}" class="btn btn-success me-2">Ver progreso de estudiantes</a>
+        {% endif %}
+
         {% if request.user.is_authenticated %}
         <span class="me-2">Bienvenido, {{ request.user.nombre }}</span>
-        <a href="{% url 'logout' %}" class="btn       btn-outline-secondary">Cerrar sesión</a>
+        <a href="{% url 'logout' %}" class="btn btn-outline-secondary">Cerrar sesión</a>
         {% else %}
-        <a href="{% url 'login' %}" class="btn btn-outline-primary      me-2">Iniciar sesión</a>
-        <a href="{% url 'registro' %}" class="btn       btn-outline-success">Registrarse</a>
+        <a href="{% url 'login' %}" class="btn btn-outline-primary me-2">Iniciar sesión</a>
+        <a href="{% url 'registro' %}" class="btn btn-outline-success">Registrarse</a>
         {% endif %}
 
       </div>

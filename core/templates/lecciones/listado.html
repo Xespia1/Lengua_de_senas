@@ -4,9 +4,9 @@
 
 {% with lecciones.0.nivel as nivel_actual %}
 <a href="{% url 'lecciones' %}" style="
-    position: absolute;
-    top: 130px;
-    left: 350px;
+    position: fixed;
+    top: 132px;
+    left: 132px;
     background: #fff;
     border: none;
     border-radius: 50%;
@@ -40,6 +40,16 @@
             <h5 class="card-title">{{ leccion.titulo }}</h5>
             <p class="card-text">{{ leccion.descripcion }}</p>
             <p class="text-muted">Nivel: {{ leccion.get_nivel_display }}</p>
+            {% if request.user.is_authenticated and request.user.rol == "estudiante" %}
+              <a href="{% url 'quiz' leccion.id %}" 
+                 class="btn 
+                        {% if leccion.nivel == 'B' %}btn-primary
+                        {% elif leccion.nivel == 'I' %}btn-success
+                        {% elif leccion.nivel == 'A' %}btn-danger
+                        {% else %}btn-secondary{% endif %}">Realizar Quiz
+              </a>
+            {% endif %}
+
             <a href="{% url 'ver_leccion' leccion.id %}"
                class="btn {% if leccion.nivel == 'B' %}btn-primary
                          {% elif leccion.nivel == 'I' %}btn-success
