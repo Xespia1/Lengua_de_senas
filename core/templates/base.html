@@ -52,7 +52,7 @@
         {% endif %}
 
         {% if request.user.is_authenticated %}
-        <span class="me-2">Bienvenido, {{ request.user.nombre }}</span>
+        <span class="me-2">Bienvenid@, {{ request.user.nombre }}</span>
         <a href="{% url 'logout' %}" class="btn btn-outline-secondary">Cerrar sesión</a>
         {% else %}
         <a href="{% url 'login' %}" class="btn btn-outline-primary me-2">Iniciar sesión</a>

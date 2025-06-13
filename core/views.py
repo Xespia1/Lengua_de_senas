@@ -44,8 +44,34 @@ def login(request):
 def home(request):
     return render(request, 'home.html')
 
+@login_required
 def seleccionar_nivel(request):
-    return render(request, 'lecciones/niveles.html')
+    usuario = request.user
+
+    # *** Básico ***
+    basico = Leccion.objects.filter(nivel='B')
+    basico_ids = list(basico.values_list('id', flat=True))
+    basico_resultados = ResultadoQuiz.objects.filter(
+        usuario=usuario, leccion__in=basico_ids, puntaje__gte=1
+    ).values_list('leccion', flat=True)
+    basico_completadas = len(set(basico_resultados))
+    total_basico = basico.count()
+    basico_completado = basico_completadas == total_basico and total_basico > 0
+
+    # *** Intermedio ***
+    intermedio = Leccion.objects.filter(nivel='I')
+    intermedio_ids = list(intermedio.values_list('id', flat=True))
+    intermedio_resultados = ResultadoQuiz.objects.filter(
+        usuario=usuario, leccion__in=intermedio_ids, puntaje__gte=5
+    ).values_list('leccion', flat=True)
+    intermedio_completadas = len(set(intermedio_resultados))
+    total_intermedio = intermedio.count()
+    intermedio_completado = intermedio_completadas == total_intermedio and total_intermedio > 0
+
+    return render(request, 'lecciones/niveles.html', {
+        'basico_completado': basico_completado,
+        'intermedio_completado': intermedio_completado,
+    })
 
 def lecciones_por_nivel(request, nivel):
     lecciones = Leccion.objects.filter(nivel=nivel).order_by('orden')

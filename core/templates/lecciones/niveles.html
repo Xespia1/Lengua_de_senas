@@ -1,11 +1,7 @@
 {% extends 'base.html' %}
-
 {% block title %}Selecciona Nivel{% endblock %}
 
-
-
 {% block content %}
-
 {% if messages %}
   {% for message in messages %}
     <div class="alert alert-info alert-dismissible fade show" role="alert">
@@ -15,15 +11,25 @@
   {% endfor %}
 {% endif %}
 
+<h2 class="text-center mb-4 fw-bold">Hola{{ request.session.usuario_nombre }}, ¿qué nivel deseas aprender hoy?</h2>
 
-  <h2 class="text-center mb-4 fw-bold">Hola{{ request.session.usuario_nombre }}, ¿qué nivel deseas aprender hoy?</h2>
+<div class="text-center mb-5">
 
-  <div class="text-center mb-5">
-    <a href="{% url 'lecciones_por_nivel' 'B' %}" class="btn btn-outline-primary nivel-btn">Básico</a>
-    <a href="{% url 'lecciones_por_nivel' 'I' %}" class="btn btn-outline-success nivel-btn">Intermedio</a>
-    <a href="{% url 'lecciones_por_nivel' 'A' %}" class="btn btn-outline-danger nivel-btn">Avanzado</a>
-    
-    
-  </div>
-  
+  <!-- Botón Básico: Siempre habilitado -->
+  <a href="{% url 'lecciones_por_nivel' 'B' %}" class="btn btn-outline-primary nivel-btn">Básico</a>
+
+  <!-- Botón Intermedio: solo si completó Básico -->
+  <a href="{% url 'lecciones_por_nivel' 'I' %}"
+     class="btn btn-outline-success nivel-btn{% if not basico_completado %} disabled{% endif %}"
+     {% if not basico_completado %}tabindex="-1" aria-disabled="true" style="pointer-events: none; opacity:0.5;" title="Completa el nivel Básico primero"{% endif %}>
+     Intermedio
+  </a>
+
+  <!-- Botón Avanzado: solo si completó Intermedio -->
+  <a href="{% url 'lecciones_por_nivel' 'A' %}"
+     class="btn btn-outline-danger nivel-btn{% if not intermedio_completado %} disabled{% endif %}"
+     {% if not intermedio_completado %}tabindex="-1" aria-disabled="true" style="pointer-events: none; opacity:0.5;" title="Completa el nivel Intermedio primero"{% endif %}>
+     Avanzado
+  </a>
+</div>
 {% endblock %}
