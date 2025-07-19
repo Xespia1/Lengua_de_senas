@@ -3,6 +3,7 @@ from django.contrib import admin
 from djongo import models
 from django.contrib.auth.base_user import BaseUserManager
 from django.conf import settings
+from django.db import models
 
 class UsuarioManager(BaseUserManager):
     def create_user(self, correo, password=None, **extra_fields):
@@ -92,10 +93,19 @@ class ResultadoQuiz(models.Model):
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     leccion = models.ForeignKey(Leccion, on_delete=models.CASCADE)
     puntaje = models.IntegerField()
-    total = models.IntegerField(default=0)
+    total = models.IntegerField(default=10)
     fecha = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.usuario} - {self.leccion} - {self.puntaje}/{self.total}"
 
 
+class Feedback(models.Model):
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    leccion = models.ForeignKey('Leccion', on_delete=models.CASCADE)
+    comentario = models.TextField("Comentario", max_length=500)
+    calificacion = models.PositiveSmallIntegerField("Calificación (1 a 5)", choices=[(i, str(i)) for i in range(1, 6)])
+    fecha = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.usuario} - {self.leccion} ({self.calificacion})"

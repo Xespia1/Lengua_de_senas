@@ -1,34 +1,64 @@
 {% extends 'base.html' %}
+{% load dict_extras %}
 {% block title %}Progreso de Estudiantes{% endblock %}
 
 {% block content %}
 <h2>Progreso de Todos los Estudiantes</h2>
-<table class="table">
+<table class="table align-middle">
   <thead>
+  <tr>
+    <th>Alumno</th>
+    <th>Lección</th>
+    <th>Puntaje</th>
+    <th>Total</th>
+    <th>Porcentaje</th>
+    <th>Fecha</th>
+    <th>Historial</th>
+  </tr>
+</thead>
+<tbody>
+  {% for resultado in ultimos_resultados %}
     <tr>
-      <th>Usuario</th>
-      <th>Apellido</th>
-      <th>Lección</th>
-      <th>Puntaje</th>
-      <th>Total</th>
-      <th>Fecha</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for resultado in resultados %}
-    <tr>
-      <td>{{ resultado.usuario }}</td>
-      <td>{{ resultado.usuario.apellido }}</td>
+      <td>{{ resultado.usuario.nombre }} {{ resultado.usuario.apellido }}</td>
       <td>{{ resultado.leccion.titulo }}</td>
-      <td>{{ resultado.puntaje }}</td>
+      <td>
+        <span class="badge bg-{% if resultado.aprobado %}success{% elif resultado.puntaje == 0 %}danger{% else %}warning text-dark{% endif %}">
+          {{ resultado.puntaje }}
+        </span>
+      </td>
       <td>{{ resultado.total }}</td>
+      <td>
+        <span class="badge bg-info text-dark">{{ resultado.porcentaje }}%</span>
+      </td>
       <td>{{ resultado.fecha|date:"d/m/Y H:i" }}</td>
+      <td>
+        <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse"
+          data-bs-target="#historial_{{ resultado.usuario.id }}_{{ resultado.leccion.id }}">
+          Ver historial
+        </button>
+      </td>
     </tr>
-    {% empty %}
-    <tr>
-      <td colspan="5" class="text-muted">No hay resultados registrados.</td>
+    <tr class="collapse" id="historial_{{ resultado.usuario.id }}_{{ resultado.leccion.id }}">
+      <td colspan="7">
+        <b>Historial de intentos:</b>
+        <ul class="mb-0">
+          {% for intento in resultado.historial %}
+            <li>
+              Puntaje:
+              <span class="badge bg-{% if intento.aprobado %}success{% elif intento.puntaje == 0 %}danger{% else %}warning text-dark{% endif %}">
+                {{ intento.puntaje }}
+              </span>
+              /{{ intento.total }}
+              | <b>{{ intento.porcentaje }}%</b>
+              | Fecha: {{ intento.fecha|date:"d/m/Y H:i" }}
+            </li>
+          {% empty %}
+            <li>No hay intentos anteriores.</li>
+          {% endfor %}
+        </ul>
+      </td>
     </tr>
-    {% endfor %}
-  </tbody>
+  {% endfor %}
+</tbody>
 </table>
 {% endblock %}

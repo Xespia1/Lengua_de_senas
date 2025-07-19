@@ -12,4 +12,7 @@ urlpatterns = [
     path('quiz/<int:leccion_id>/', views.quiz_view, name='quiz'),
     path('progreso/', views.progreso_usuario, name='progreso_usuario'),
     path('progreso_todos/', views.progreso_estudiantes, name='progreso_estudiantes'),
+    path('leccion/<int:leccion_id>/feedback/', views.enviar_feedback, name='enviar_feedback'),
+    path('feedback_admin/', views.feedback_admin, name='feedback_admin'),
+
 ]

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Comentarios y feedback de los estudiantes</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Lección</th>
+            <th>Comentario</th>
+            <th>Calificación</th>
+            <th>Fecha</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for fb in feedbacks %}
+        <tr>
+            <td>{{ fb.usuario }}</td>
+            <td>{{ fb.usuario.apellido }}</td>
+            <td>{{ fb.leccion.titulo }}</td>
+            <td>{{ fb.comentario }}</td>
+            <td>{{ fb.calificacion }}</td>
+            <td>{{ fb.fecha|date:"d/m/Y H:i" }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5">Sin feedback aún.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

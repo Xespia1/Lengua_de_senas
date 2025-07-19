@@ -46,8 +46,8 @@
         <a href="{% url 'progreso_usuario' %}" class="btn btn-warning me-2">Ver mi progreso</a>
         {% endif %}
 
-        <!-- Ver Progreso Docente-->
-        {% if request.user.is_authenticated and request.user.rol == 'docente' %}
+        <!-- Ver Progreso Docente y Administrador -->
+        {% if request.user.is_authenticated and request.user.rol == 'docente' or request.user.rol == 'admin' %}
         <a href="{% url 'progreso_estudiantes' %}" class="btn btn-success me-2">Ver progreso de estudiantes</a>
         {% endif %}
 

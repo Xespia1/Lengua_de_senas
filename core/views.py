@@ -4,7 +4,8 @@ from .models import *
 from django.contrib import messages
 from django.contrib.auth import authenticate, logout, login as auth_login
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum, Count, Q
+from django.db.models import Sum, Count, Q, F
+from collections import defaultdict
 
 def vista_admin(request):
     if request.user.rol != 'admin':
@@ -62,7 +63,7 @@ def seleccionar_nivel(request):
     intermedio = Leccion.objects.filter(nivel='I')
     intermedio_ids = list(intermedio.values_list('id', flat=True))
     intermedio_resultados = ResultadoQuiz.objects.filter(
-        usuario=usuario, leccion__in=intermedio_ids, puntaje__gte=5
+        usuario=usuario, leccion__in=intermedio_ids, puntaje__gte=1
     ).values_list('leccion', flat=True)
     intermedio_completadas = len(set(intermedio_resultados))
     total_intermedio = intermedio.count()
@@ -88,7 +89,8 @@ def lecciones_por_nivel(request, nivel):
 
 def ver_leccion(request, pk):
     leccion = get_object_or_404(Leccion, pk=pk)
-    return render(request, 'lecciones/ver_leccion.html', {'leccion': leccion})
+    form = FeedbackForm()
+    return render(request, 'lecciones/ver_leccion.html', {'leccion': leccion, 'form': form})
 
 
 def logout_view(request):
@@ -135,13 +137,17 @@ def quiz_view(request, leccion_id):
 def progreso_usuario(request):
     usuario = request.user
     total_lecciones = Leccion.objects.count()
-    lecciones_completadas = ResultadoQuiz.objects.filter(
-        usuario=usuario, puntaje__gte=1
-    ).values_list('leccion_id', flat=True)
+    resultados_usuario = ResultadoQuiz.objects.filter(usuario=usuario)
+    lecciones_completadas = set()
+    for resultado in resultados_usuario:
+        if resultado.total > 0 and resultado.puntaje >= (resultado.total * 0.6):
+            lecciones_completadas.add(resultado.leccion_id)
     completadas = len(set(lecciones_completadas))
     porcentaje = int((completadas / total_lecciones) * 100) if total_lecciones > 0 else 0
 
     resultados = ResultadoQuiz.objects.filter(usuario=usuario).select_related('leccion').order_by('-fecha')
+    for resultado in resultados:
+        resultado.aprobado = resultado.total > 0 and resultado.puntaje >= (resultado.total * 0.6)
 
     return render(request, 'lecciones/progreso.html', {
         'resultados': resultados,
@@ -154,30 +160,55 @@ def progreso_estudiantes(request):
     if not request.user.is_authenticated or request.user.rol != "docente":
         return redirect('lecciones')
 
-    resultados = ResultadoQuiz.objects.select_related('usuario', 'leccion').all().order_by('-fecha')
+    resultados = ResultadoQuiz.objects.select_related('usuario', 'leccion').order_by('usuario', 'leccion', '-fecha')
+    ultimos_resultados = {}
+    historial_listo = []
+    for resultado in resultados:
+        resultado.aprobado = resultado.total > 0 and resultado.puntaje >= (resultado.total * 0.6)
+
+
+    agrupados = defaultdict(list)
+    for res in resultados:
+        res.aprobado = res.total > 0 and res.puntaje >= (res.total * 0.6)
+        res.porcentaje = int((res.puntaje / res.total) * 100) if res.total > 0 else 0
+        key = (res.usuario.id, res.leccion.id)
+        agrupados[key].append(res)
+        
+    for key, intentos in agrupados.items():
+        mas_reciente = intentos[0]
+        historial = intentos[1:]
+        for intento in historial:
+            intento.porcentaje = int((intento.puntaje / intento.total) * 100) if intento.total > 0 else 0
+        mas_reciente.historial = historial
+        ultimos_resultados[key] = mas_reciente
+        historial_listo.append(mas_reciente)
 
     context = {
-        'resultados': resultados,
+        'ultimos_resultados': historial_listo,
     }
     return render(request, 'lecciones/progreso_todos.html', context)
 
-def progreso_todos(request):
-    resultados = ResultadoQuiz.objects.select_related('usuario', 'leccion').all().order_by('-fecha')
 
-    # Cálculo del progreso general (ejemplo: porcentaje de quizzes aprobados por todos los estudiantes)
-    total_lecciones = Leccion.objects.count()
-    total_usuarios = Usuario.objects.count()
+@login_required
+def enviar_feedback(request, leccion_id, ):
+    leccion = get_object_or_404(Leccion, pk=leccion_id)
+    if request.method == "POST":
+        form = FeedbackForm(request.POST)
+        if form.is_valid():
+            feedback = form.save(commit=False)
+            feedback.usuario = request.user
+            feedback.leccion = leccion
+            feedback.save()
+            messages.success(request, "¡Gracias por tu feedback!")
+            return redirect('lecciones')
+    else:
+        form = FeedbackForm()
+    return render(request, "lecciones/feedback_modal.html", {"form": form, "leccion": leccion})
+    
 
-    # Si quieres porcentaje de quizzes completados (independiente del puntaje):
-    total_resultados = ResultadoQuiz.objects.count()
-    total_posibles = total_lecciones * total_usuarios
-    porcentaje = int((total_resultados / total_posibles) * 100) if total_posibles > 0 else 0
-
-    # Quizzes aprobados
-    # quizzes_aprobados = ResultadoQuiz.objects.filter(puntaje=F('total')).count()
-    # porcentaje = int((quizzes_aprobados / total_posibles) * 100) if total_posibles > 0 else 0
-
-    return render(request, 'lecciones/progreso_todos.html', {
-        'resultados': resultados,
-        'porcentaje': porcentaje,
-    })
+@login_required
+def feedback_admin(request):
+    if request.user.rol not in ["admin", "docente"]:
+        return redirect('lecciones')
+    feedbacks = Feedback.objects.select_related('usuario', 'leccion').order_by('-fecha')
+    return render(request, "lecciones/feedback_admin.html", {"feedbacks": feedbacks})

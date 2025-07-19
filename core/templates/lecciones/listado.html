@@ -49,13 +49,59 @@
                         {% else %}btn-secondary{% endif %}">Realizar Quiz
               </a>
             {% endif %}
-
             <a href="{% url 'ver_leccion' leccion.id %}"
                class="btn {% if leccion.nivel == 'B' %}btn-primary
                          {% elif leccion.nivel == 'I' %}btn-success
                          {% elif leccion.nivel == 'A' %}btn-danger
                          {% else %}btn-secondary{% endif %}">Ver lección
             </a>
+            
+            <!-- Botón Feedback: llama al modal de esta lección -->
+            {% if request.user.is_authenticated and request.user.rol == "estudiante" %}
+              <button type="button"
+                class="btn btn-outline-warning"
+                data-bs-toggle="modal"
+                data-bs-target="#feedbackModal_{{ leccion.id }}">
+                Feedback
+              </button>
+              {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal de Feedback para ESTA lección -->
+      <div class="modal fade" id="feedbackModal_{{ leccion.id }}" tabindex="-1" aria-labelledby="feedbackModalLabel_{{ leccion.id }}" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <form method="post" action="{% url 'enviar_feedback' leccion.id %}">
+              {% csrf_token %}
+              <div class="modal-header">
+                <h5 class="modal-title" id="feedbackModalLabel_{{ leccion.id }}">Deja tu feedback</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+              </div>
+              <div class="modal-body">
+                <p><strong>Lección:</strong> {{ leccion.nivel.choices }} - {{ leccion.titulo }}</p>
+                <div class="mb-3">
+                  <label for="comentario_{{ leccion.id }}" class="form-label">Comentario</label>
+                  <textarea class="form-control" id="comentario_{{ leccion.id }}" name="comentario" rows="3" maxlength="500" required></textarea>
+                </div>
+                <div class="mb-3">
+                  <label for="calificacion_{{ leccion.id }}" class="form-label">Calificación</label>
+                  <select class="form-select" id="calificacion_{{ leccion.id }}" name="calificacion" required>
+                    <option value="">Selecciona una calificación</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                  </select>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Enviar</button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
@@ -64,4 +110,5 @@
     {% endfor %}
   </div>
 </div>
+
 {% endblock %}

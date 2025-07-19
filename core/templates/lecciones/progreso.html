@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load dict_extras %}
 {% block title %}Progreso de Estudiantes{% endblock %}
 
 {% block content %}
@@ -36,7 +37,7 @@
   <div class="mb-4">
     <div><b>Progreso general del curso:</b></div>
     <div class="progreso-bar-bg">
-      <div class="progreso-bar-fill" style="width: {{ porcentaje|default:'60' }}%;">
+      <div class="progreso-bar-fill" style="width: {{ porcentaje|default:'0' }}%;">
         {{ porcentaje|default:"60" }}%
       </div>
     </div>
@@ -62,8 +63,8 @@
           <td>{{ resultado.usuario.apellido }}</td>
           <td>{{ resultado.leccion.titulo }}</td>
           <td>
-            <span class="badge bg-{% if resultado.puntaje == resultado.total %}success{% elif resultado.puntaje == 0 %}danger{% else %}warning text-dark{% endif %}">
-              {{ resultado.puntaje }}
+            <span class="badge bg-{% if resultado.aprobado %}success{% elif resultado.puntaje == 0 %}danger{% else %}warning text-dark{% endif %}">
+                {{ resultado.puntaje }}
             </span>
           </td>
           <td>{{ resultado.total }}</td>

@@ -38,3 +38,12 @@ class QuizForm(forms.Form):
                 widget=forms.RadioSelect,
                 required=True,
             )
+
+class FeedbackForm(forms.ModelForm):
+    class Meta:
+        model = Feedback
+        fields = ['comentario', 'calificacion']
+        widgets = {
+            'comentario': forms.Textarea(attrs={'rows': 3, 'class': 'form-control', 'placeholder': 'Escribe tu comentario aquí...'}),
+            'calificacion': forms.Select(attrs={'class': 'form-select'})
+        }
