@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',
+    'widget_tweaks'
 ]
 
 MIDDLEWARE = [
@@ -113,7 +114,7 @@ AUTH_USER_MODEL = 'core.Usuario'
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'america/santiago'
 
 USE_I18N = True
 
@@ -127,3 +128,4 @@ USE_TZ = True
 
 STATIC_URL = 'core/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'core/static'), BASE_DIR / 'static']
+LOGIN_URL = '/login/'

@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% load dict_extras %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2 class="mb-4 text-center">Editar Quiz: <span class="text 
+    {% if leccion.nivel == 'B' %}text-primary
+    {% elif leccion.nivel == 'I' %}text-success
+    {% elif leccion.nivel == 'A' %}text-danger
+    {% else %}text-secondary{% endif %}">{{ leccion.titulo }}</span></h2>
+
+
+
+<div class="card mb-4">
+  <div class="card-header">Agregar nueva pregunta</div>
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      {{ pregunta_form.as_p }}
+      <div>
+        <strong>Alternativas:</strong>
+        <div class="row">
+          {% for i in "0123" %}
+            <div class="col-12 d-flex align-items-center mb-2">
+              <input type="text" name="nueva_alternativa_{{ i }}" class="form-control me-2" placeholder="Alternativa {{ forloop.counter }}" required>
+              <label class="ms-2 d-flex align-items-center mb-0">
+                <input type="radio" name="nueva_correcta" value="{{ i }}" required>
+                <span class="ms-1">Correcta</span>
+              </label>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+      <button type="submit" name="agregar_pregunta" class="btn 
+        {% if leccion.nivel == 'B' %}btn-primary
+        {% elif leccion.nivel == 'I' %}btn-success
+        {% elif leccion.nivel == 'A' %}btn-danger
+        {% else %}btn-secondary{% endif %}">Agregar Pregunta</button>
+    </form>
+  </div>
+</div>
+
+  <div class="card">
+    <div class="card-header">Preguntas Actuales</div>
+    <div class="card-body">
+      {% if preguntas %}
+        <ul class="list-group">
+          {% for pregunta in preguntas %}
+            <li class="list-group-item d-flex justify-content-between align-items-start flex-column flex-md-row" id="pregunta-{{ pregunta.id }}">
+              <div style="width:100%">
+                {% if pregunta_editar and pregunta_editar.id == pregunta.id %}
+
+
+                  <form method="post" class="editar-form" id="form-editar-{{ pregunta.id }}">
+                    {% csrf_token %}
+                    {{ editar_form.as_p }}
+                    {{ editar_formset.management_form }}
+                    <div><strong>Alternativas:</strong></div>
+                    <div class="d-flex flex-column gap-2">
+                      {% for form in editar_formset.forms %}
+                        <div class="d-flex align-items-center">
+                          <span class="me-2"><b>{{ forloop.counter }}.</b></span>
+                          <div class="flex-grow-1">{{ form.texto }}</div>
+                          <label>
+                            <input type="radio" name="editar_correcta_{{ pregunta.id }}" class="radio-correcta" value="{{ forloop.counter0 }}"
+                            {% if form.instance.es_correcta or forloop.counter0|stringformat:"s" == request.POST.editar_correcta %}checked{% endif %} required>
+                            <span class="ms-2">Correcta</span>
+                          </label>
+                          
+                        </div>
+                      {% endfor %}
+                    </div>
+                    <input type="hidden" name="editar_correcta" id="editar_correcta_hidden_{{ pregunta.id }}" value="{% for form in editar_formset.forms %}{% if form.instance.es_correcta %}{{ forloop.counter0 }}{% endif %}{% endfor %}">
+                    <input type="hidden" name="pregunta_id" value="{{ pregunta.id }}">
+                    <button type="submit" name="guardar_editar" class="btn btn-success btn-sm">Guardar</button>
+                    <a href="{% url 'editar_quiz' leccion.id %}" class="btn btn-secondary btn-sm">Cancelar</a>
+                  </form>
+                {% else %}
+                  <b>{{ forloop.counter }}.</b> {{ pregunta.texto }}
+                  <br>
+                  <ol class="mt-2" type="A">
+                    {% for respuesta in pregunta.respuestas.all %}
+                      <li>
+                        {{ respuesta.texto }}
+                        {% if respuesta.es_correcta %}
+                          <span class="badge bg-success">Correcta</span>
+                      {% endif %}
+                    </li>
+                  {% endfor %}
+                </ol>
+                {% endif %}
+              </div>
+              {% if not pregunta_editar or pregunta_editar.id != pregunta.id %}
+                <div class="d-flex align-items-center mb-2">
+                  <form method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="pregunta_id" value="{{ pregunta.id }}">
+                    <a href="{% url 'editar_pregunta' leccion.id pregunta.id %}" class="btn btn-primary btn-sm me-1">Editar</a>
+
+                  </form>
+                  <form class="d-flex align-items-center mb-1" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="pregunta_id" value="{{ pregunta.id }}">
+                    <button type="submit" name="eliminar_pregunta" class="btn btn-danger btn-sm mt-1"
+                      onclick="return confirm('¿Seguro que deseas eliminar esta pregunta?');">
+                      Eliminar
+                    </button>
+                  </form>
+                </div>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-muted">No hay preguntas en este quiz.</p>
+      {% endif %}
+    </div>
+  </div>
+  <a href="{% url 'lecciones_por_nivel' leccion.nivel %}" class="btn btn-secondary mt-4">Volver</a>
+</div>
+
+<!-- JS editar -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.editar-form').forEach(function(form) {
+    form.addEventListener('submit', function(e) {
+      var pregunta_id = form.querySelector('input[name="pregunta_id"]').value;
+      var radios = form.querySelectorAll('input[name="editar_correcta_' + pregunta_id + '"]');
+      var hidden = form.querySelector('input[name="editar_correcta"]');
+      var checked = false;
+      radios.forEach(function(radio, idx) {
+        if(radio.checked) {
+          hidden.value = idx;
+          checked = true;
+        }
+      });
+      if(!checked) {
+        alert('Debes seleccionar una alternativa correcta.');
+        e.preventDefault();
+      }
+    });
+  });
+});
+</script>
+{% endblock %}

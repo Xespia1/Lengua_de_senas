@@ -48,8 +48,7 @@
     <table class="table align-middle">
       <thead>
         <tr>
-          <th>Estudiante</th>
-          <th>Apellido</th>
+          <th>Nivel</th>
           <th>Lección</th>
           <th>Puntaje</th>
           <th>Total</th>
@@ -59,11 +58,10 @@
       <tbody>
         {% for resultado in resultados %}
         <tr>
-          <td>{{ resultado.usuario }}</td>
-          <td>{{ resultado.usuario.apellido }}</td>
+          <td>{{ resultado.leccion.get_nivel_display }}</td>
           <td>{{ resultado.leccion.titulo }}</td>
           <td>
-            <span class="badge bg-{% if resultado.aprobado %}success{% elif resultado.puntaje == 0 %}danger{% else %}warning text-dark{% endif %}">
+            <span class="badge bg-{% if resultado.aprobado %}success{% elif resultado.puntaje == 0 %}danger{% else %}warning text-dark{% endif %} " >
                 {{ resultado.puntaje }}
             </span>
           </td>

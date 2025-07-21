@@ -2,6 +2,33 @@
 {% block title %}{{ leccion.titulo }}{% endblock %}
 
 {% block content %}
+{% with lecciones.0.nivel as nivel_actual %}
+<a href="{% url 'lecciones_por_nivel' leccion.nivel %}" style="
+    position: fixed;
+    top: 132px;
+    left: 132px;
+    background: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    z-index: 1000;
+">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none"
+        stroke="{% if leccion.get_nivel_display == 'Básico' %}#0d6efd
+                {% elif leccion.get_nivel_display == 'Intermedio' %}#198754
+                {% elif leccion.get_nivel_display == 'Avanzado' %}#dc3545
+                {% else %}#000000{% endif %}"
+        stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 18l-6-6 6-6"/>
+    </svg>
+</a>
+{% endwith %}
 
 <div class="container mt-5">
   <div class="card shadow">
@@ -40,13 +67,7 @@
         <p>No hay videos disponibles para esta lección.</p>
       {% endif %}
 
-      <div class="d-flex justify-content-end">
-        <a href="{% url 'lecciones_por_nivel' leccion.nivel %}" class="btn btn-primary  
-            btn {% if leccion.nivel == 'B' %}btn-primary
-            {% elif leccion.nivel == 'I' %}btn-success
-            {% elif leccion.nivel == 'A' %}btn-danger
-            {% else %}btn-secondary{% endif %}"">Volver a {{ leccion.get_nivel_display }}</a>
-      </div>
+      
     </div>
   </div>
 </div>

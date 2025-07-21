@@ -1,15 +1,22 @@
 body {
   font-family: 'Poppins', sans-serif;
-  background: linear-gradient(to right, #e6ecf3, #f8fbff);
+  background: url('/static/wallpaper.webp') no-repeat center center fixed;
+  background-size: cover;
   height: 100vh;
 }
 
 .login-card {
-  background: rgba(255, 255, 255, 0.94);
+  background: rgba(255,255,255,0.94);
   border-radius: 20px;
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.05);
-  backdrop-filter: blur(5px);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.05);
   padding: 30px;
+  backdrop-filter: blur(5px);
+}
+
+@media (max-width: 576px) {
+  .login-card {
+    padding: 18px 6px;
+  }
 }
 
 .btn-primary:hover {

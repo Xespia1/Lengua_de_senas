@@ -14,5 +14,7 @@ urlpatterns = [
     path('progreso_todos/', views.progreso_estudiantes, name='progreso_estudiantes'),
     path('leccion/<int:leccion_id>/feedback/', views.enviar_feedback, name='enviar_feedback'),
     path('feedback_admin/', views.feedback_admin, name='feedback_admin'),
+    path('leccion/<int:leccion_id>/editar_quiz/', views.editar_quiz, name='editar_quiz'),
+    path('leccion/<int:leccion_id>/pregunta/<int:pregunta_id>/editar/', views.editar_pregunta, name='editar_pregunta'),
 
 ]

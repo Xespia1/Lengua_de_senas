@@ -4,61 +4,146 @@
 
 {% block content %}
 <h2>Progreso de Todos los Estudiantes</h2>
-<table class="table align-middle">
-  <thead>
-  <tr>
-    <th>Alumno</th>
-    <th>Lección</th>
-    <th>Puntaje</th>
-    <th>Total</th>
-    <th>Porcentaje</th>
-    <th>Fecha</th>
-    <th>Historial</th>
-  </tr>
+<table class="table align-middle" id="progreso-table">
+<thead>
+<tr>
+  <th data-sort="str" data-title="Alumno" onclick="sortTable(0, 'str')"></th>
+  <th>Nivel</th>
+  <th data-sort="str" data-title="Lección"></th>
+  <th data-sort="num" data-title="Puntaje" onclick="sortTable(2, 'num')"></th>
+  <th data-sort="num" data-title="Total"></th>
+  <th data-sort="porc" data-title="Porcentaje" onclick="sortTable(4, 'porc')"></th>
+  <th data-sort="fecha" data-title="Fecha" onclick="sortTable(5, 'fecha')"></th>
+  <th>Historial</th>
+</tr>
 </thead>
-<tbody>
-  {% for resultado in ultimos_resultados %}
-    <tr>
-      <td>{{ resultado.usuario.nombre }} {{ resultado.usuario.apellido }}</td>
-      <td>{{ resultado.leccion.titulo }}</td>
-      <td>
-        <span class="badge bg-{% if resultado.aprobado %}success{% elif resultado.puntaje == 0 %}danger{% else %}warning text-dark{% endif %}">
-          {{ resultado.puntaje }}
-        </span>
-      </td>
-      <td>{{ resultado.total }}</td>
-      <td>
-        <span class="badge bg-info text-dark">{{ resultado.porcentaje }}%</span>
-      </td>
-      <td>{{ resultado.fecha|date:"d/m/Y H:i" }}</td>
-      <td>
-        <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse"
-          data-bs-target="#historial_{{ resultado.usuario.id }}_{{ resultado.leccion.id }}">
-          Ver historial
-        </button>
-      </td>
-    </tr>
-    <tr class="collapse" id="historial_{{ resultado.usuario.id }}_{{ resultado.leccion.id }}">
-      <td colspan="7">
-        <b>Historial de intentos:</b>
-        <ul class="mb-0">
-          {% for intento in resultado.historial %}
-            <li>
-              Puntaje:
-              <span class="badge bg-{% if intento.aprobado %}success{% elif intento.puntaje == 0 %}danger{% else %}warning text-dark{% endif %}">
-                {{ intento.puntaje }}
-              </span>
-              /{{ intento.total }}
-              | <b>{{ intento.porcentaje }}%</b>
-              | Fecha: {{ intento.fecha|date:"d/m/Y H:i" }}
-            </li>
-          {% empty %}
-            <li>No hay intentos anteriores.</li>
-          {% endfor %}
-        </ul>
-      </td>
-    </tr>
-  {% endfor %}
-</tbody>
+  <tbody>
+    {% for resultado in ultimos_resultados %}
+      <tr>
+        <td>{{ resultado.usuario.nombre }} {{ resultado.usuario.apellido }}</td>
+        <td>{{ resultado.leccion.get_nivel_display }}</td>
+        <td>{{ resultado.leccion.titulo }}</td>
+        <td>
+          <span class="badge bg-{% if resultado.aprobado %}success{% elif resultado.puntaje == 0 %}danger{% else %}warning text-dark{% endif %}">
+            {{ resultado.puntaje }}
+          </span>
+        </td>
+        <td>{{ resultado.total }}</td>
+        <td>
+          <span class="badge bg-info text-dark">{{ resultado.porcentaje }}%</span>
+        </td>
+        <td>{{ resultado.fecha|date:"d/m/Y H:i" }}</td>
+        <td>
+          <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse"
+            data-bs-target="#historial_{{ resultado.usuario.id }}_{{ resultado.leccion.id }}">
+            Ver historial
+          </button>
+        </td>
+      </tr>
+      <tr class="collapse" id="historial_{{ resultado.usuario.id }}_{{ resultado.leccion.id }}">
+        <td colspan="7">
+          <b>Historial de intentos:</b>
+          <ul class="mb-0">
+            {% for intento in resultado.historial %}
+              <li>
+                Puntaje:
+                <span class="badge bg-{% if intento.aprobado %}success{% elif intento.puntaje == 0 %}danger{% else %}warning text-dark{% endif %}">
+                  {{ intento.puntaje }}
+                </span>
+                /{{ intento.total }}
+                | <b>{{ intento.porcentaje }}%</b>
+                | Fecha: {{ intento.fecha|date:"d/m/Y H:i" }}
+              </li>
+            {% empty %}
+              <li>No hay intentos anteriores.</li>
+            {% endfor %}
+          </ul>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
 </table>
+
+<!-- JS para filtros y ordenamiento -->
+<script>
+let currentSortCol = null;
+let currentSortDir = "asc";
+
+function parseFecha(fechaStr) {
+    var partes = fechaStr.split(" ");
+    if (partes.length < 2) return new Date(0);
+    var fecha = partes[0].split("/");
+    var hora = partes[1].split(":");
+    return new Date(+fecha[2], +fecha[1]-1, +fecha[0], +hora[0], +hora[1]);
+}
+
+function clearArrows() {
+    document.querySelectorAll("th[data-sort]").forEach(th => {
+        th.innerHTML = th.dataset.title + ' <span class="arrow"></span>';
+    });
+}
+
+function sortTable(n, tipo="str") {
+    var table = document.querySelector("table");
+    var rows = Array.from(table.tBodies[0].rows);
+
+    // Guardar pares de filas (principal + historial)
+    let rowPairs = [];
+    for (let i = 0; i < rows.length; i += 2) {
+        rowPairs.push([rows[i], rows[i+1]]);
+    }
+
+    // Alternar sentido si ya está ordenado por esa columna
+    if (currentSortCol === n) {
+        currentSortDir = currentSortDir === "asc" ? "desc" : "asc";
+    } else {
+        currentSortDir = "asc";
+        currentSortCol = n;
+    }
+
+    // Limpiar flechitas
+    clearArrows();
+    var ths = document.querySelectorAll("th[data-sort]");
+    if (ths[n]) {
+        let flecha = currentSortDir === "asc" ? "▲" : "▼";
+        ths[n].innerHTML = ths[n].dataset.title + ' <span class="arrow">' + flecha + '</span>';
+    }
+
+    rowPairs.sort(function(a, b) {
+        let x = a[0].cells[n].textContent.trim();
+        let y = b[0].cells[n].textContent.trim();
+        let cmpX, cmpY;
+        if (tipo === "num" || tipo === "porc") {
+            cmpX = parseFloat(x) || 0;
+            cmpY = parseFloat(y) || 0;
+        } else if (tipo === "fecha") {
+            cmpX = parseFecha(x);
+            cmpY = parseFecha(y);
+        } else {
+            cmpX = x.toLowerCase();
+            cmpY = y.toLowerCase();
+        }
+        if (cmpX < cmpY) return currentSortDir === "asc" ? -1 : 1;
+        if (cmpX > cmpY) return currentSortDir === "asc" ? 1 : -1;
+        return 0;
+    });
+
+    // Elimina todas las filas y re-inserta en el orden nuevo
+    let tbody = table.tBodies[0];
+    rowPairs.forEach(pair => {
+        tbody.appendChild(pair[0]);
+        if (pair[1]) tbody.appendChild(pair[1]);
+    });
+}
+
+// Inicializar flechitas
+document.addEventListener("DOMContentLoaded", function(){
+    clearArrows();
+});
+</script>
+<style>
+.arrow { font-size: 14px; vertical-align: middle; color: #888;}
+th[data-sort] { cursor: pointer; user-select: none; }
+</style>
+
 {% endblock %}

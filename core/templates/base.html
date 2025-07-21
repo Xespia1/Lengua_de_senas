@@ -41,11 +41,17 @@
     <div class="container">
       <a class="navbar-brand" href="{% url 'lecciones' %}">Aprende LSCH</a>
       <div class="ms-auto">
+
+        <!-- Feedbacks -->
+        {% if request.user.is_authenticated and request.user.rol == 'admin' %}
+        <a href="{% url 'feedback_admin' %}" class="btn btn-warning me-1">Ver Feedbacks</a>
+        {% endif %}
+        
         <!-- Ver Progreso Alumno-->
         {% if request.user.is_authenticated and request.user.rol == 'estudiante' %}
         <a href="{% url 'progreso_usuario' %}" class="btn btn-warning me-2">Ver mi progreso</a>
         {% endif %}
-
+        
         <!-- Ver Progreso Docente y Administrador -->
         {% if request.user.is_authenticated and request.user.rol == 'docente' or request.user.rol == 'admin' %}
         <a href="{% url 'progreso_estudiantes' %}" class="btn btn-success me-2">Ver progreso de estudiantes</a>
@@ -64,7 +70,17 @@
     </div>
   </nav>
 
+  <!-- Alertas -->
   <div class="container py-5">
+    {% if messages %}
+      {% for message in messages %}
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+    {% endfor %}
+  {% endif %}
+  
     {% block content %}{% endblock %}
   </div>
 

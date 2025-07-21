@@ -1,5 +1,6 @@
 from django import forms
 from .models import *
+from django.forms import modelformset_factory, BaseModelFormSet
 
 class RegistroForm(forms.ModelForm):
     contraseña = forms.CharField(widget=forms.PasswordInput)
@@ -47,3 +48,29 @@ class FeedbackForm(forms.ModelForm):
             'comentario': forms.Textarea(attrs={'rows': 3, 'class': 'form-control', 'placeholder': 'Escribe tu comentario aquí...'}),
             'calificacion': forms.Select(attrs={'class': 'form-select'})
         }
+
+class PreguntaForm(forms.ModelForm):
+    class Meta:
+        model = Pregunta
+        fields = ['texto']
+        widgets = {
+            'texto': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Texto de la pregunta'})
+        }
+
+
+class RespuestaForm(forms.ModelForm):
+    class Meta:
+        model = Respuesta
+        fields = ['texto', 'es_correcta']
+        widgets = {
+            'texto': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Alternativa'}),
+            'es_correcta': forms.RadioSelect,
+        }
+
+RespuestaFormSet = modelformset_factory(
+    Respuesta,
+    form=RespuestaForm,
+    extra=0,
+    min_num=4,
+    validate_min=True
+)

@@ -1,7 +1,5 @@
 {% extends 'base.html' %}
-
 {% block content %}
-
 {% with lecciones.0.nivel as nivel_actual %}
 <a href="{% url 'lecciones' %}" style="
     position: fixed;
@@ -55,8 +53,13 @@
                          {% elif leccion.nivel == 'A' %}btn-danger
                          {% else %}btn-secondary{% endif %}">Ver lección
             </a>
+            {% if request.user.is_authenticated and request.user.rol in 'docente,administrador'  %}
+              <a href="{% url 'editar_quiz' leccion.id %}" 
+                class="btn btn-outline-warning">
+                Editar Quiz
+              </a>
+              {% endif %}
             
-            <!-- Botón Feedback: llama al modal de esta lección -->
             {% if request.user.is_authenticated and request.user.rol == "estudiante" %}
               <button type="button"
                 class="btn btn-outline-warning"
@@ -69,7 +72,6 @@
         </div>
       </div>
 
-      <!-- Modal de Feedback para ESTA lección -->
       <div class="modal fade" id="feedbackModal_{{ leccion.id }}" tabindex="-1" aria-labelledby="feedbackModalLabel_{{ leccion.id }}" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
@@ -83,7 +85,7 @@
                 <p><strong>Lección:</strong> {{ leccion.nivel.choices }} - {{ leccion.titulo }}</p>
                 <div class="mb-3">
                   <label for="comentario_{{ leccion.id }}" class="form-label">Comentario</label>
-                  <textarea class="form-control" id="comentario_{{ leccion.id }}" name="comentario" rows="3" maxlength="500" required></textarea>
+                  <textarea placeholder="Escribe aquí tu mensaje..." class="form-control" id="comentario_{{ leccion.id }}" name="comentario" rows="3" maxlength="10" required></textarea>
                 </div>
                 <div class="mb-3">
                   <label for="calificacion_{{ leccion.id }}" class="form-label">Calificación</label>

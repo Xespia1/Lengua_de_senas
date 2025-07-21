@@ -34,6 +34,8 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     password = models.CharField(max_length=128)
     progreso = models.IntegerField(default=0)
     rol = models.CharField(max_length=15, choices=ROL_CHOICES, default='estudiante')
+    intentos_fallidos = models.IntegerField(default=0)
+    bloqueado_hasta = models.DateTimeField(null=True, blank=True)
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
